@@ -36,7 +36,7 @@ class ReplayScraper:
 
     def download_files(self, url, verbose=1):
         url = url.rstrip('/')
-        mid_dir = url.split('/')[-5:-1]
+        mid_dir = url.split('/')[-6:-1]
         user_dir = url.split('/')[-1]
         user_dir_clean = self.__remove_illegal_chars(user_dir)
 
