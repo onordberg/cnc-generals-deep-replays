@@ -12,6 +12,7 @@ def download_files(url, data_dir, verbose=1):
     soup = BeautifulSoup(page.text, 'html.parser')
     links = soup.find_all('a')[5:]  # Ignore the top links as they are not files
     local_subdir = url[28:]  # removing "http://www.gentool.net/data/" from the url
+    local_subdir = remove_illegal_chars(local_subdir)
     local_subdir = pathlib.Path(data_dir, local_subdir)
     local_subdir.mkdir(parents=True, exist_ok=True)
     # print(local_subdir)
@@ -20,7 +21,8 @@ def download_files(url, data_dir, verbose=1):
     for i, link in enumerate(links):
         filename = link.get('href')
         full_url = str(url + '/' + filename)
-        local_full_path = local_subdir.joinpath(filename)
+        filename_local = remove_illegal_chars(filename)
+        local_full_path = local_subdir.joinpath(filename_local)
         # print(local_full_path)
         r = requests.get(full_url)
         with open(local_full_path, 'wb') as file:
@@ -31,6 +33,13 @@ def download_files(url, data_dir, verbose=1):
     if verbose in (1, 2):
         print('Finished downloading files from url. Saved', len(links), 'files to disk', local_subdir.as_posix())
     return len(links)
+
+
+def remove_illegal_chars(text):
+    chars = '\\*?:"<>|'  # / is allowed because it is obviously reserved for dir divisions
+    for c in chars:
+        text = text.replace(c, '_')
+    return text
 
 
 def download_day(day_url, data_dir, zh_ccg='zh', network_online='online', sleep_secs=3):
@@ -55,4 +64,4 @@ def download_day(day_url, data_dir, zh_ccg='zh', network_online='online', sleep_
 #                DATA_DIR)
 
 n_files_total = download_day('http://www.gentool.net/data/2020_12_December/01_Tuesday', DATA_DIR,
-                             zh_ccg='zh', network_online='online', sleep_secs=3)
+                             zh_ccg='zh', network_online='network', sleep_secs=3)
