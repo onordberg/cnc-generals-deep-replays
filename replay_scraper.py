@@ -74,16 +74,6 @@ class ReplayScraper:
                                                   local_full_path.as_posix(),
                                                   time.time()]
             self.file_count += 1
-            # log = {'date': month_date,
-            #        'user_dir': user_dir,
-            #        'user_dir_clean': user_dir_clean,
-            #        'filename': filename,
-            #        'filename_clean': filename_local,
-            #        'zh_ccg': zh_ccg,
-            #        'online_network': online_network,
-            #        'remote_url': full_url,
-            #        'local_path': local_full_path,
-            #        'unix_time_downloaded': time.time()}
 
             if verbose == 2:
                 if (i + 1) % 10 == 0:
@@ -103,7 +93,13 @@ class ReplayScraper:
             print(i, 'of', len(links) - 1)
             dir_name = link.get('href')
             full_url = str(url + '/' + dir_name)
-            n_files = self.download_files(full_url, verbose=1)
+            while True:
+                try:
+                    n_files = self.download_files(full_url, verbose=1)
+                    break
+                except Exception:
+                    print('Problems when downloading files. Sleeping for 60 seconds...')
+                    time.sleep(60)
             n_files_sum += n_files
             time.sleep(self.sleep_secs)
         print('Finished downloading', n_files_sum, 'files from day dir')
